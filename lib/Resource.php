@@ -381,7 +381,7 @@ class Resource implements \ArrayAccess
     public function get($property, $type = null, $lang = null)
     {
         $this->checkHasGraph();
-        return $this->graph->get($this->uri, $property, $type, $lang);
+        return $this->graph->get($this->uri, new Resource($property), $type, $lang);
     }
 
     /** Get a single literal value for a property of the resource
@@ -400,7 +400,7 @@ class Resource implements \ArrayAccess
     public function getLiteral($property, $lang = null)
     {
         $this->checkHasGraph();
-        return $this->graph->get($this->uri, $property, 'literal', $lang);
+        return $this->graph->get($this->uri, new Resource($property), 'literal', $lang);
     }
 
     /** Get a single resource value for a property of the resource
@@ -418,7 +418,7 @@ class Resource implements \ArrayAccess
     public function getResource($property)
     {
         $this->checkHasGraph();
-        return $this->graph->get($this->uri, $property, 'resource');
+        return $this->graph->get($this->uri, new Resource($property), 'resource');
     }
 
     /** Get all values for a property
