@@ -290,7 +290,7 @@ class Resource implements \ArrayAccess
     public function delete($property, $value = null)
     {
         $this->checkHasGraph();
-        return $this->graph->delete($this->uri, $property, $value);
+        return $this->graph->delete($this->uri, new Resource($property), $value);
     }
 
     /** Add values to for a property of the resource
