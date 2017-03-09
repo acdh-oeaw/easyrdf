@@ -62,6 +62,13 @@ class Resource implements \ArrayAccess
      */
     public function __construct($uri, $graph = null)
     {
+        if ($uri instanceof Resource) {
+            $graph = $graph ? $graph : $uri->getGraph();
+            $uri = $uri->getUri();
+        }
+        
+        $uri = preg_replace('|^<(.*)>$|', '\\1', $uri);
+        
         if (!is_string($uri) or $uri == null or $uri == '') {
             throw new \InvalidArgumentException(
                 "\$uri should be a string and cannot be null or empty"
@@ -427,7 +434,7 @@ class Resource implements \ArrayAccess
     public function all($property, $type = null, $lang = null)
     {
         $this->checkHasGraph();
-        return $this->graph->all($this->uri, $property, $type, $lang);
+        return $this->graph->all($this->uri, new Resource($property), $type, $lang);
     }
 
     /** Get all literal values for a property of the resource
@@ -443,7 +450,7 @@ class Resource implements \ArrayAccess
     public function allLiterals($property, $lang = null)
     {
         $this->checkHasGraph();
-        return $this->graph->all($this->uri, $property, 'literal', $lang);
+        return $this->graph->all($this->uri, new Resource($property), 'literal', $lang);
     }
 
     /** Get all resources for a property of the resource
@@ -458,7 +465,7 @@ class Resource implements \ArrayAccess
     public function allResources($property)
     {
         $this->checkHasGraph();
-        return $this->graph->all($this->uri, $property, 'resource');
+        return $this->graph->all($this->uri, new Resource($property), 'resource');
     }
 
     /** Count the number of values for a property of a resource
