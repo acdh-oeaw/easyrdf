@@ -454,7 +454,7 @@ class Graph
         if (is_object($resource) and $resource instanceof Resource) {
             $resource = $resource->getUri();
         } elseif (is_object($resource) and $resource instanceof ParsedUri) {
-            $resource = strval($resource);
+            $resource = RdfNamespace::expand(strval($resource));
         } elseif (is_string($resource)) {
             if ($resource == '') {
                 throw new \InvalidArgumentException(
