@@ -539,6 +539,10 @@ class Graph
                     'lang' => isset($value['lang']) ? strval($value['lang']) : null,
                     'datatype' => isset($value['datatype']) ? strval($value['datatype']) : null
                 );
+
+                if ($value['type'] == 'uri') {
+                    $value['value'] = RdfNamespace::expand($value['value']);
+                }
             } else {
                 $value = array(
                     'type' => 'literal',
@@ -641,6 +645,7 @@ class Graph
     {
         $this->checkResourceParam($resource);
         $this->checkSinglePropertyParam($property, $inverse);
+
 
         // Get an array of values for the property
         $values = $this->propertyValuesArray($resource, $property, $inverse);
