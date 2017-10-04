@@ -839,12 +839,8 @@ class Resource implements \ArrayAccess
      *   not specified)
      * @return \EasyRdf\Resource
      */
-    public function copy(
-        array $skipProp = array(),
-        $skipRegExp = '/^$/',
-        $overwriteUri = '',
-        Graph $graph = null
-    ) {
+    public function copy(array $skipProp = array(), $skipRegExp = '/^$/', $overwriteUri = '', Graph $graph = null)
+    {
         $graph = $graph ? $graph : new Graph();
         $res = $graph->resource($overwriteUri ? $overwriteUri : $this->getUri());
 
