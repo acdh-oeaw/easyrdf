@@ -848,13 +848,11 @@ class Resource implements \ArrayAccess
             if (in_array($prop, $skipProp) || preg_match($skipRegExp, $prop)) {
                 continue;
             }
-            foreach ($this->allResources($prop) as $i) {
-                /* @var $i Resource */
-                $res->addResource($prop, $i->getUri());
-            }
             foreach ($this->allLiterals($prop) as $i) {
-                /* @var $i Literal */
-                $res->addLiteral($prop, new Literal((string) $i, $i->getLang(), $i->getDatatype()));
+                $res->addLiteral($prop, $i->getValue(), $i->getLang());
+            }
+            foreach ($this->allResources($prop) as $i) {
+                $res->addResource($prop, $i->getUri());
             }
         }
 
@@ -882,13 +880,11 @@ class Resource implements \ArrayAccess
             if (!in_array($prop, $preserve)) {
                 $this->delete($prop);
             }
-            foreach ($toMerge->allResources($prop) as $i) {
-                /* @var $i Resource */
-                $this->addResource($prop, $i->getUri());
-            }
             foreach ($toMerge->allLiterals($prop) as $i) {
-                /* @var $i Literal */
-                $this->addLiteral($prop, new Literal((string) $i, $i->getLang(), $i->getDatatype()));
+                $this->addLiteral($prop, $i->getValue(), $i->getLang());
+            }
+            foreach ($toMerge->allResources($prop) as $i) {
+                $this->addResource($prop, $i->getUri());
             }
         }
         return $this;
