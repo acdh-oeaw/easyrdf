@@ -44,7 +44,8 @@ namespace EasyRdf;
  * @copyright  Copyright (c) 2009-2013 Nicholas J Humfrey
  * @license    http://www.opensource.org/licenses/bsd-license.php
  */
-class Resource implements \ArrayAccess {
+class Resource implements \ArrayAccess
+{
 
     /** The URI for this resource */
     protected $uri = null;
@@ -60,18 +61,17 @@ class Resource implements \ArrayAccess {
      * $resource = $graph->resource('http://www.example.com/');
      *
      */
-    public function __construct($uri, $graph = null) {
+    public function __construct($uri, $graph = null)
+    {
         if ($uri instanceof Resource) {
             $graph = $graph ? $graph : $uri->getGraph();
-            $uri   = $uri->getUri();
+            $uri = $uri->getUri();
         }
 
         $uri = preg_replace('|^<(.*)>$|', '\\1', $uri);
 
         if (!is_string($uri) or $uri == null or $uri == '') {
-            throw new \InvalidArgumentException(
-            "\$uri should be a string and cannot be null or empty"
-            );
+            throw new \InvalidArgumentException("\$uri should be a string and cannot be null or empty");
         }
 
         $this->uri = $uri;
@@ -80,9 +80,7 @@ class Resource implements \ArrayAccess {
         if (is_object($graph) and $graph instanceof Graph) {
             $this->graph = $graph;
         } elseif (!is_null($graph)) {
-            throw new \InvalidArgumentException(
-            '$graph should be an EasyRdf\Graph object'
-            );
+            throw new \InvalidArgumentException('$graph should be an EasyRdf\Graph object');
         }
     }
 
@@ -91,7 +89,8 @@ class Resource implements \ArrayAccess {
      *
      * @return Graph
      */
-    public function getGraph() {
+    public function getGraph()
+    {
         return $this->graph;
     }
 
@@ -99,7 +98,8 @@ class Resource implements \ArrayAccess {
      *
      * @return string  URI of this resource.
      */
-    public function getUri() {
+    public function getUri()
+    {
         return $this->uri;
     }
 
@@ -107,7 +107,8 @@ class Resource implements \ArrayAccess {
      *
      * @return bool True if this resource is a blank node.
      */
-    public function isBNode() {
+    public function isBNode()
+    {
         if (substr($this->uri, 0, 2) == '_:') {
             return true;
         } else {
@@ -121,7 +122,8 @@ class Resource implements \ArrayAccess {
      *
      * @return string The identifer for the bnode
      */
-    public function getBNodeId() {
+    public function getBNodeId()
+    {
         if (substr($this->uri, 0, 2) == '_:') {
             return substr($this->uri, 2);
         } else {
@@ -136,7 +138,8 @@ class Resource implements \ArrayAccess {
      *
      * @return string The namespace prefix of the resource (e.g. foaf)
      */
-    public function prefix() {
+    public function prefix()
+    {
         return RdfNamespace::prefixOfUri($this->uri);
     }
 
@@ -147,7 +150,8 @@ class Resource implements \ArrayAccess {
      *
      * @return string The shortened URI of this resource (e.g. foaf:name)
      */
-    public function shorten() {
+    public function shorten()
+    {
         return RdfNamespace::shorten($this->uri);
     }
 
@@ -158,7 +162,8 @@ class Resource implements \ArrayAccess {
      *
      * @return string The local name
      */
-    public function localName() {
+    public function localName()
+    {
         if (preg_match("|([^#:/]+)$|", $this->uri, $matches)) {
             return $matches[1];
         }
@@ -168,7 +173,8 @@ class Resource implements \ArrayAccess {
      *
      * @return ParsedUri
      */
-    public function parseUri() {
+    public function parseUri()
+    {
         return new ParsedUri($this->uri);
     }
 
@@ -182,7 +188,8 @@ class Resource implements \ArrayAccess {
      * @throws \InvalidArgumentException
      * @return string  The HTML link string
      */
-    public function htmlLink($text = null, $options = array()) {
+    public function htmlLink($text = null, $options = array())
+    {
         $options = array_merge(array('href' => $this->uri), $options);
         if ($text === null) {
             $text = $this->uri;
@@ -191,13 +198,11 @@ class Resource implements \ArrayAccess {
         $html = "<a";
         foreach ($options as $key => $value) {
             if (!preg_match('/^[-\w]+$/', $key)) {
-                throw new \InvalidArgumentException(
-                "\$options should use valid attribute names as keys"
-                );
+                throw new \InvalidArgumentException("\$options should use valid attribute names as keys");
             }
 
             $html .= " " . htmlspecialchars($key) . "=\"" .
-                htmlspecialchars($value) . "\"";
+                    htmlspecialchars($value) . "\"";
         }
         $html .= ">" . htmlspecialchars($text) . "</a>";
 
@@ -211,7 +216,8 @@ class Resource implements \ArrayAccess {
      *
      * @return array  The properties of the resource
      */
-    public function toRdfPhp() {
+    public function toRdfPhp()
+    {
         if ($this->isBNode()) {
             return array('type' => 'bnode', 'value' => $this->uri);
         } else {
@@ -226,7 +232,8 @@ class Resource implements \ArrayAccess {
      *
      * @return string
      */
-    public function dumpValue($format = 'html', $color = 'blue') {
+    public function dumpValue($format = 'html', $color = 'blue')
+    {
         return Utils::dumpResourceValue($this, $format, $color);
     }
 
@@ -234,18 +241,18 @@ class Resource implements \ArrayAccess {
      *
      * @return string The URI of the resource
      */
-    public function __toString() {
+    public function __toString()
+    {
         return $this->uri;
     }
 
     /** Throw can exception if the resource does not belong to a graph
      *  @ignore
      */
-    protected function checkHasGraph() {
+    protected function checkHasGraph()
+    {
         if (!$this->graph) {
-            throw new Exception(
-            'EasyRdf\Resource is not part of a graph.'
-            );
+            throw new Exception('EasyRdf\Resource is not part of a graph.');
         }
     }
 
@@ -258,7 +265,8 @@ class Resource implements \ArrayAccess {
      *
      * @return integer
      */
-    public function load($format = null) {
+    public function load($format = null)
+    {
         $this->checkHasGraph();
         return $this->graph->load($this->uri, $format);
     }
@@ -270,7 +278,8 @@ class Resource implements \ArrayAccess {
      *
      * @return integer
      */
-    public function delete($property, $value = null) {
+    public function delete($property, $value = null)
+    {
         $this->checkHasGraph();
         return $this->graph->delete($this->uri, new Resource($property), $value);
     }
@@ -285,7 +294,8 @@ class Resource implements \ArrayAccess {
      *
      * @return integer           The number of values added (1 or 0)
      */
-    public function add($property, $value) {
+    public function add($property, $value)
+    {
         $this->checkHasGraph();
         return $this->graph->add($this->uri, $property, $value);
     }
@@ -303,7 +313,8 @@ class Resource implements \ArrayAccess {
      *
      * @return integer           The number of values added
      */
-    public function addLiteral($property, $values, $lang = null) {
+    public function addLiteral($property, $values, $lang = null)
+    {
         $this->checkHasGraph();
         return $this->graph->addLiteral($this->uri, $property, $values, $lang);
     }
@@ -318,7 +329,8 @@ class Resource implements \ArrayAccess {
      *
      * @return integer           The number of values added (1 or 0)
      */
-    public function addResource($property, $resource2) {
+    public function addResource($property, $resource2)
+    {
         $this->checkHasGraph();
         return $this->graph->addResource($this->uri, $property, $resource2);
     }
@@ -335,7 +347,8 @@ class Resource implements \ArrayAccess {
      *
      * @return integer           The number of values added (1 or 0)
      */
-    public function set($property, $value) {
+    public function set($property, $value)
+    {
         $this->checkHasGraph();
         return $this->graph->set($this->uri, $property, $value);
     }
@@ -356,7 +369,8 @@ class Resource implements \ArrayAccess {
      *
      * @return mixed                  A value associated with the property
      */
-    public function get($property, $type = null, $lang = null) {
+    public function get($property, $type = null, $lang = null)
+    {
         $this->checkHasGraph();
         return $this->graph->get($this->uri, new Resource($property), $type, $lang);
     }
@@ -374,7 +388,8 @@ class Resource implements \ArrayAccess {
      *
      * @return Literal  Literal value associated with the property
      */
-    public function getLiteral($property, $lang = null) {
+    public function getLiteral($property, $lang = null)
+    {
         $this->checkHasGraph();
         return $this->graph->get($this->uri, new Resource($property), 'literal', $lang);
     }
@@ -391,7 +406,8 @@ class Resource implements \ArrayAccess {
      *
      * @return self  Resource associated with the property
      */
-    public function getResource($property) {
+    public function getResource($property)
+    {
         $this->checkHasGraph();
         return $this->graph->get($this->uri, new Resource($property), 'resource');
     }
@@ -406,7 +422,8 @@ class Resource implements \ArrayAccess {
      *
      * @return array             An array of values associated with the property
      */
-    public function all($property, $type = null, $lang = null) {
+    public function all($property, $type = null, $lang = null)
+    {
         $this->checkHasGraph();
         return $this->graph->all($this->uri, new Resource($property), $type, $lang);
     }
@@ -421,7 +438,8 @@ class Resource implements \ArrayAccess {
      *
      * @return array             An array of values associated with the property
      */
-    public function allLiterals($property, $lang = null) {
+    public function allLiterals($property, $lang = null)
+    {
         $this->checkHasGraph();
         return $this->graph->all($this->uri, new Resource($property), 'literal', $lang);
     }
@@ -435,7 +453,8 @@ class Resource implements \ArrayAccess {
      *
      * @return array             An array of values associated with the property
      */
-    public function allResources($property) {
+    public function allResources($property)
+    {
         $this->checkHasGraph();
         return $this->graph->all($this->uri, new Resource($property), 'resource');
     }
@@ -450,7 +469,8 @@ class Resource implements \ArrayAccess {
      *
      * @return integer           The number of values associated with the property
      */
-    public function countValues($property, $type = null, $lang = null) {
+    public function countValues($property, $type = null, $lang = null)
+    {
         $this->checkHasGraph();
         return $this->graph->countValues($this->uri, $property, $type, $lang);
     }
@@ -466,7 +486,8 @@ class Resource implements \ArrayAccess {
      *
      * @return string            Concatenation of all the values.
      */
-    public function join($property, $glue = ' ', $lang = null) {
+    public function join($property, $glue = ' ', $lang = null)
+    {
         $this->checkHasGraph();
         return $this->graph->join($this->uri, $property, $glue, $lang);
     }
@@ -477,7 +498,8 @@ class Resource implements \ArrayAccess {
      *
      * @return array            Array of full URIs
      */
-    public function propertyUris() {
+    public function propertyUris()
+    {
         $this->checkHasGraph();
         return $this->graph->propertyUris($this->uri);
     }
@@ -488,7 +510,8 @@ class Resource implements \ArrayAccess {
      *
      * @return array            Array of shortened URIs
      */
-    public function properties() {
+    public function properties()
+    {
         $this->checkHasGraph();
         return $this->graph->properties($this->uri);
     }
@@ -497,7 +520,8 @@ class Resource implements \ArrayAccess {
      *
      * @return array   Array of full property URIs
      */
-    public function reversePropertyUris() {
+    public function reversePropertyUris()
+    {
         $this->checkHasGraph();
         return $this->graph->reversePropertyUris($this->uri);
     }
@@ -513,7 +537,8 @@ class Resource implements \ArrayAccess {
      *
      * @return bool              True if value the property exists.
      */
-    public function hasProperty($property, $value = null) {
+    public function hasProperty($property, $value = null)
+    {
         $this->checkHasGraph();
         return $this->graph->hasProperty($this->uri, $property, $value);
     }
@@ -525,7 +550,8 @@ class Resource implements \ArrayAccess {
      *
      * @return array All types assocated with the resource (e.g. foaf:Person)
      */
-    public function types() {
+    public function types()
+    {
         $this->checkHasGraph();
         return $this->graph->types($this->uri);
     }
@@ -539,7 +565,8 @@ class Resource implements \ArrayAccess {
      *
      * @return string A type assocated with the resource (e.g. foaf:Person)
      */
-    public function type() {
+    public function type()
+    {
         $this->checkHasGraph();
         return $this->graph->type($this->uri);
     }
@@ -553,7 +580,8 @@ class Resource implements \ArrayAccess {
      *
      * @return Resource A type assocated with the resource.
      */
-    public function typeAsResource() {
+    public function typeAsResource()
+    {
         $this->checkHasGraph();
         return $this->graph->typeAsResource($this->uri);
     }
@@ -564,7 +592,8 @@ class Resource implements \ArrayAccess {
      * @return Resource[]
      * @throws Exception
      */
-    public function typesAsResources() {
+    public function typesAsResources()
+    {
         $this->checkHasGraph();
         return $this->graph->typesAsResources($this->uri);
     }
@@ -575,7 +604,8 @@ class Resource implements \ArrayAccess {
      *
      * @return boolean       True if resource is of specified type.
      */
-    public function isA($type) {
+    public function isA($type)
+    {
         $this->checkHasGraph();
         return $this->graph->isA($this->uri, $type);
     }
@@ -586,7 +616,8 @@ class Resource implements \ArrayAccess {
      *
      * @return integer           The number of types added
      */
-    public function addType($types) {
+    public function addType($types)
+    {
         $this->checkHasGraph();
         return $this->graph->addType($this->uri, $types);
     }
@@ -599,7 +630,8 @@ class Resource implements \ArrayAccess {
      *
      * @return integer           The number of types added
      */
-    public function setType($type) {
+    public function setType($type)
+    {
         $this->checkHasGraph();
         return $this->graph->setType($this->uri, $type);
     }
@@ -610,7 +642,8 @@ class Resource implements \ArrayAccess {
      *
      * @return Resource The primary topic of this resource.
      */
-    public function primaryTopic() {
+    public function primaryTopic()
+    {
         $this->checkHasGraph();
         return $this->graph->primaryTopic($this->uri);
     }
@@ -626,7 +659,8 @@ class Resource implements \ArrayAccess {
      *
      * @return string A label for the resource.
      */
-    public function label($lang = null) {
+    public function label($lang = null)
+    {
         $this->checkHasGraph();
         return $this->graph->label($this->uri, $lang);
     }
@@ -640,7 +674,8 @@ class Resource implements \ArrayAccess {
      *
      * @return string
      */
-    public function dump($format = 'html') {
+    public function dump($format = 'html')
+    {
         $this->checkHasGraph();
         return $this->graph->dumpResource($this->uri, $format);
     }
@@ -658,7 +693,8 @@ class Resource implements \ArrayAccess {
      *
      * @return string  A single value for the named property
      */
-    public function __get($name) {
+    public function __get($name)
+    {
         return $this->graph->get($this->uri, $name);
     }
 
@@ -676,7 +712,8 @@ class Resource implements \ArrayAccess {
      *
      * @return int
      */
-    public function __set($name, $value) {
+    public function __set($name, $value)
+    {
         return $this->graph->set($this->uri, $name, $value);
     }
 
@@ -693,7 +730,8 @@ class Resource implements \ArrayAccess {
      *
      * @return bool
      */
-    public function __isset($name) {
+    public function __isset($name)
+    {
         return $this->graph->hasProperty($this->uri, $name);
     }
 
@@ -710,7 +748,8 @@ class Resource implements \ArrayAccess {
      *
      * @return int
      */
-    public function __unset($name) {
+    public function __unset($name)
+    {
         return $this->graph->delete($this->uri, $name);
     }
 
@@ -728,7 +767,8 @@ class Resource implements \ArrayAccess {
      *
      * @return boolean true on success or false on failure.
      */
-    public function offsetExists($offset) {
+    public function offsetExists($offset)
+    {
         return $this->__isset($offset);
     }
 
@@ -744,7 +784,8 @@ class Resource implements \ArrayAccess {
      *
      * @return mixed Can return all value types.
      */
-    public function offsetGet($offset) {
+    public function offsetGet($offset)
+    {
         return $this->__get($offset);
     }
 
@@ -761,7 +802,8 @@ class Resource implements \ArrayAccess {
      *
      * @return void
      */
-    public function offsetSet($offset, $value) {
+    public function offsetSet($offset, $value)
+    {
         $this->__set($offset, $value);
     }
 
@@ -777,7 +819,8 @@ class Resource implements \ArrayAccess {
      *
      * @return void
      */
-    public function offsetUnset($offset) {
+    public function offsetUnset($offset)
+    {
         $this->__unset($offset);
     }
 
@@ -796,17 +839,26 @@ class Resource implements \ArrayAccess {
      *   not specified)
      * @return \EasyRdf\Resource
      */
-    public function copy(array $skipProp = array(), string $skipRegExp = '/^$/',
-                         string $overwriteUri = '', Graph $graph = null): Resource {
+    public function copy(
+        array $skipProp = array(),
+        string $skipRegExp = '/^$/',
+        string $overwriteUri = '',
+        Graph $graph = null
+    ) {
         $graph = $graph ? $graph : new Graph();
-        $res   = $graph->resource($overwriteUri ? $overwriteUri : $this->getUri());
+        $res = $graph->resource($overwriteUri ? $overwriteUri : $this->getUri());
 
         foreach ($this->propertyUris() as $prop) {
             if (in_array($prop, $skipProp) || preg_match($skipRegExp, $prop)) {
                 continue;
             }
-            foreach ($this->all($prop) as $i) {
-                $res->add($prop, $i);
+            foreach ($this->allResources($prop) as $i) {
+                /* @var $i Resource */
+                $res->addResource($prop, $i->getUri());
+            }
+            foreach ($this->allLiterals($prop) as $i) {
+                /* @var $i Literal */
+                $res->addLiteral($prop, new Literal($i->getValue(), $i->getLang(), $i->getDatatype()));
             }
         }
 
@@ -822,20 +874,27 @@ class Resource implements \ArrayAccess {
      * - Those properties from current which do not exist in `toMerge`.
      * - `preserve` properties from current.
      * 
+     * Copied properties are cloned.
+     * 
      * @param \EasyRdf\Resource $toMerge metadata to be merged with current metadata
      * @param array $preserve URIs of the current resource's properties to be kept
      * @return \EasyRdf\Resource
      */
-    public function merge(Resource $toMerge, array $preserve = array()): Resource {
+    public function merge(Resource $toMerge, array $preserve = array())
+    {
         foreach ($toMerge->propertyUris() as $prop) {
             if (!in_array($prop, $preserve)) {
                 $this->delete($prop);
             }
-            foreach ($toMerge->all($prop) as $i) {
-                $this->add($prop, $i);
+            foreach ($toMerge->allResources($prop) as $i) {
+                /* @var $i Resource */
+                $this->addResource($prop, $i->getUri());
+            }
+            foreach ($toMerge->allLiterals($prop) as $i) {
+                /* @var $i Literal */
+                $this->addLiteral($prop, new Literal($i->getValue(), $i->getLang(), $i->getDatatype()));
             }
         }
         return $this;
     }
-
 }
