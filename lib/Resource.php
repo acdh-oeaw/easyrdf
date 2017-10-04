@@ -854,7 +854,7 @@ class Resource implements \ArrayAccess
             }
             foreach ($this->allLiterals($prop) as $i) {
                 /* @var $i Literal */
-                $res->addLiteral($prop, new Literal($i->getValue(), $i->getLang(), $i->getDatatype()));
+                $res->addLiteral($prop, new Literal((string) $i, $i->getLang(), $i->getDatatype()));
             }
         }
 
@@ -888,7 +888,7 @@ class Resource implements \ArrayAccess
             }
             foreach ($toMerge->allLiterals($prop) as $i) {
                 /* @var $i Literal */
-                $this->addLiteral($prop, new Literal($i->getValue(), $i->getLang(), $i->getDatatype()));
+                $this->addLiteral($prop, new Literal((string) $i, $i->getLang(), $i->getDatatype()));
             }
         }
         return $this;
