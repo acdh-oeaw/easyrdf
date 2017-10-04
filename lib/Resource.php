@@ -841,8 +841,8 @@ class Resource implements \ArrayAccess
      */
     public function copy(
         array $skipProp = array(),
-        string $skipRegExp = '/^$/',
-        string $overwriteUri = '',
+        $skipRegExp = '/^$/',
+        $overwriteUri = '',
         Graph $graph = null
     ) {
         $graph = $graph ? $graph : new Graph();
