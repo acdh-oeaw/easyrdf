@@ -284,6 +284,21 @@ class Resource implements \ArrayAccess
         return $this->graph->delete($this->uri, new Resource($property), $value);
     }
 
+    /** Delete an object property (or optionally just a specific value)
+     *
+     * @param  string  $property The name of the property (e.g. foaf:name)
+     * @param  object  $value The value to delete (null to delete all values)
+     *
+     * @return integer
+     */
+    public function deleteResource($property, $value = null)
+    {
+        if (is_string($value)) {
+            $value = array('type' => 'uri', 'value' => $value);
+        }
+        return $this->delete($property, $value);
+    }
+    
     /** Add values to for a property of the resource
      *
      * Example:
