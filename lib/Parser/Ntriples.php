@@ -61,26 +61,23 @@ class Ntriples extends Parser
             return $str;
         }
 
+        // https://www.w3.org/TR/rdf-testcases/#ntrip_strings
         $mappings = array(
-            't' => chr(0x09),
-            'b' => chr(0x08),
-            'n' => chr(0x0A),
-            'r' => chr(0x0D),
-            'f' => chr(0x0C),
-            '\"' => chr(0x22),
-            '\'' => chr(0x27)
+            '\\t' => chr(0x09),
+            '\\n' => chr(0x0A),
+            '\\r' => chr(0x0D),
+            '\\"' => chr(0x22),
+            '\\\\' => chr(0x5c)
         );
-        foreach ($mappings as $in => $out) {
-            $str = preg_replace('/\x5c([' . $in . '])/', $out, $str);
-        }
+        $str = str_replace(array_keys($mappings), array_values($mappings), $str);
 
-        if (stripos($str, '\u') === false) {
+        if (stripos($str, '\\u') === false) {
             return $str;
         }
 
-        while (preg_match('/\\\(U)([0-9A-F]{8})/', $str, $matches) ||
-               preg_match('/\\\(u)([0-9A-F]{4})/', $str, $matches)) {
-            $no = hexdec($matches[2]);
+        while (preg_match('/\\\\U([0-9A-F]{8})/', $str, $matches) ||
+               preg_match('/\\\\u([0-9A-F]{4})/', $str, $matches)) {
+            $no = hexdec($matches[1]);
             if ($no < 128) {                // 0x80
                 $char = chr($no);
             } elseif ($no < 2048) {         // 0x800
@@ -99,7 +96,7 @@ class Ntriples extends Parser
                 # FIXME: throw an exception instead?
                 $char = '';
             }
-            $str = str_replace('\\' . $matches[1] . $matches[2], $char, $str);
+            $str = str_replace($matches[0], $char, $str);
         }
         return $str;
     }
