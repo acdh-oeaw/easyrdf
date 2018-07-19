@@ -59,6 +59,7 @@ use EasyRdf\RdfNamespace;
 class Turtle extends Ntriples
 {
     protected $data;
+    protected $index;
     protected $namespaces;
     protected $subject;
     protected $predicate;
@@ -95,7 +96,8 @@ class Turtle extends Ntriples
             );
         }
 
-        $this->data = $data;
+        $this->data = preg_split('//u', $data, null, PREG_SPLIT_NO_EMPTY);
+        $this->index = 0;
         $this->namespaces = array();
         $this->subject = null;
         $this->predicate = null;
@@ -1168,8 +1170,8 @@ class Turtle extends Ntriples
      */
     protected function read()
     {
-        if (!empty($this->data)) {
-            $c = mb_substr($this->data, 0, 1, "UTF-8");
+        if ($this->index < count($this->data)) {
+            $c = $this->data[$this->index];
             // Keep tracks of which line we are on (0A = Line Feed)
             if ($c == "\x0A") {
                 $this->line += 1;
@@ -1177,13 +1179,7 @@ class Turtle extends Ntriples
             } else {
                 $this->column += 1;
             }
-
-            if (version_compare(PHP_VERSION, '5.4.8', '<')) {
-                // versions of PHP prior to 5.4.8 treat "NULL" length parameter as 0
-                $this->data = mb_substr($this->data, 1, mb_strlen($this->data), "UTF-8");
-            } else {
-                $this->data = mb_substr($this->data, 1, null, "UTF-8");
-            }
+            $this->index += 1;
             return $c;
         } else {
             return -1;
@@ -1197,8 +1193,8 @@ class Turtle extends Ntriples
      */
     protected function peek()
     {
-        if (!empty($this->data)) {
-            return mb_substr($this->data, 0, 1, "UTF-8");
+        if ($this->index < count($this->data)) {
+            return $this->data[$this->index];
         } else {
             return -1;
         }
@@ -1212,8 +1208,12 @@ class Turtle extends Ntriples
     protected function unread($c)
     {
         # FIXME: deal with unreading new lines
-        $this->column -= mb_strlen($c, "UTF-8");
-        $this->data = $c . $this->data;
+        $len = mb_strlen($c, "UTF-8");
+        $this->column -= $len;
+        $this->index -= $len;
+        foreach (preg_split('//u', $c, null, PREG_SPLIT_NO_EMPTY) as $h => $i) {
+            $this->data[$this->index + $h] = $i;
+        }
     }
 
     /** @ignore */
