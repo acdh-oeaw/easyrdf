@@ -239,31 +239,31 @@ class GraphVizTest extends TestCase
         $svg = $this->serialiser->serialise($this->graph, 'svg');
 
         $this->assertContains(
-            'class="node"><title>Rhttp://www.example.com/joe#me</title>',
+            '<title>Rhttp://www.example.com/joe#me</title>',
             $svg
         );
         $this->assertContains(
-            'class="node"><title>LJoe Bloggs</title>',
+            '<title>LJoe Bloggs</title>',
             $svg
         );
         $this->assertContains(
-            'class="edge"><title>Rhttp://www.example.com/joe#me&#45;&gt;LJoe Bloggs</title>',
+            '<title>Rhttp://www.example.com/joe#me&#45;&gt;LJoe Bloggs</title>',
             $svg
         );
         $this->assertContains(
-            'class="node"><title>B_:genid1</title>',
+            '<title>B_:genid1</title>',
             $svg
         );
         $this->assertContains(
-            'class="edge"><title>Rhttp://www.example.com/joe#me&#45;&gt;B_:genid1</title>',
+            '<title>Rhttp://www.example.com/joe#me&#45;&gt;B_:genid1</title>',
             $svg
         );
         $this->assertContains(
-            'class="node"><title>LProject Name</title>',
+            '<title>LProject Name</title>',
             $svg
         );
         $this->assertContains(
-            'class="edge"><title>B_:genid1&#45;&gt;LProject Name</title>',
+            '<title>B_:genid1&#45;&gt;LProject Name</title>',
             $svg
         );
     }
