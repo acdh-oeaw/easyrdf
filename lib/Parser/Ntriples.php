@@ -1,4 +1,5 @@
 <?php
+
 namespace EasyRdf\Parser;
 
 /**
@@ -7,6 +8,7 @@ namespace EasyRdf\Parser;
  * LICENSE
  *
  * Copyright (c) 2009-2013 Nicholas J Humfrey.  All rights reserved.
+ * Copyright (c) 2020 Austrian Centre for Digital Humanities.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -47,6 +49,7 @@ use EasyRdf\Parser;
  */
 class Ntriples extends Parser
 {
+
     /**
      * Decodes an encoded N-Triples string. Any \-escape sequences are substituted
      * with their decoded value.
@@ -54,20 +57,23 @@ class Ntriples extends Parser
      * @param  string $str An encoded N-Triples string.
      *
      * @return string The unencoded string.
-     **/
+     * */
     protected function unescapeString($str)
     {
         if (strpos($str, '\\') === false) {
             return $str;
         }
 
-        // https://www.w3.org/TR/rdf-testcases/#ntrip_strings
+        // https://www.w3.org/TR/n-triples/#n-triples-grammar
         $mappings = array(
-            '\\t' => chr(0x09),
-            '\\n' => chr(0x0A),
-            '\\r' => chr(0x0D),
-            '\\"' => chr(0x22),
-            '\\\\' => chr(0x5c)
+            '\\b' => chr(8),
+            '\\t' => "\t",
+            '\\n' => "\n",
+            '\\f' => chr(12),
+            '\\r' => "\r",
+            '\\"' => '"',
+            "\\'" => "'",
+            '\\\\' => "\\"
         );
         $str = str_replace(array_keys($mappings), array_values($mappings), $str);
 
@@ -76,7 +82,8 @@ class Ntriples extends Parser
         }
 
         while (preg_match('/\\\\U([0-9A-F]{8})/', $str, $matches) ||
-               preg_match('/\\\\u([0-9A-F]{4})/', $str, $matches)) {
+        preg_match('/\\\\u([0-9A-F]{4})/', $str, $matches)) {
+            // can be replaced with mb_chr() in PHP >=7.2 
             $no = hexdec($matches[1]);
             if ($no < 128) {                // 0x80
                 $char = chr($no);
@@ -117,8 +124,8 @@ class Ntriples extends Parser
             }
         } else {
             throw new Exception(
-                "Failed to parse subject: $sub",
-                $lineNum
+                    "Failed to parse subject: $sub",
+                    $lineNum
             );
         }
     }
@@ -126,42 +133,39 @@ class Ntriples extends Parser
     /**
      * @ignore
      */
-    protected function parseNtriplesObject($obj, $lineNum)
+    protected function parseNtriplesObject(&$matches, $lineNum)
     {
-        if (preg_match('/"(.+)"\^\^<([^<>]+)>/', $obj, $matches)) {
-            return array(
-                'type' => 'literal',
-                'value' => $this->unescapeString($matches[1]),
-                'datatype' => $this->unescapeString($matches[2])
-            );
-        } elseif (preg_match('/"(.+)"@([\w\-]+)/', $obj, $matches)) {
-            return array(
-                'type' => 'literal',
-                'value' => $this->unescapeString($matches[1]),
-                'lang' => $this->unescapeString($matches[2])
-            );
-        } elseif (preg_match('/"(.*)"/', $obj, $matches)) {
-            return array('type' => 'literal', 'value' => $this->unescapeString($matches[1]));
-        } elseif (preg_match('/<([^<>]+)>/', $obj, $matches)) {
-            return array('type' => 'uri', 'value' => $this->unescapeString($matches[1]));
-        } elseif (preg_match('/_:([A-Za-z0-9]*)/', $obj, $matches)) {
-            if (empty($matches[1])) {
+        switch ($matches[3][0]) {
+            case '"':
+                $ret = array(
+                    'type' => 'literal',
+                    'value' => $this->unescapeString(substr($matches[3], 1, -1))
+                );
+                if (count($matches) === 7) {
+                    $ret['lang'] = substr($matches[6], 1);
+                } elseif (count($matches) === 6) {
+                    $ret['datatype'] = $this->unescapeString(substr($matches[5], 3, -1));
+                }
+                return $ret;
+            case '_':
+                if (strlen($matches[3]) === 2) {
+                    // empty bnode id is not in line with https://www.w3.org/TR/n-triples/#n-triples-grammar
+                    // but examples exist in tests so let's leave it
+                    $bnode = $this->graph->newBNodeId();
+                } else {
+                    $bnode = $this->remapBnode(substr($matches[3], 2));
+                }
                 return array(
                     'type' => 'bnode',
-                    'value' => $this->graph->newBNodeId()
+                    'value' => $bnode
                 );
-            } else {
-                $nodeid = $this->unescapeString($matches[1]);
+            case '<':
                 return array(
-                    'type' => 'bnode',
-                    'value' => $this->remapBnode($nodeid)
+                    'type' => 'uri',
+                    'value' => $this->unescapeString(substr($matches[3], 1, -1))
                 );
-            }
-        } else {
-            throw new Exception(
-                "Failed to parse object: $obj",
-                $lineNum
-            );
+            default:
+                throw new Exception("Failed to parse object: " . $matches[3], $lineNum);
         }
     }
 
@@ -183,7 +187,7 @@ class Ntriples extends Parser
 
         if ($format != 'ntriples') {
             throw new \EasyRdf\Exception(
-                "EasyRdf\\Parser\\Ntriples does not support: $format"
+                    "EasyRdf\\Parser\\Ntriples does not support: $format"
             );
         }
 
@@ -193,19 +197,19 @@ class Ntriples extends Parser
             if (preg_match('/^\s*#/', $line)) {
                 # Comment
                 continue;
-            } elseif (preg_match('/^\s*(.+?)\s+<([^<>]+?)>\s+(.+?)\s*\.\s*$/', $line, $matches)) {
+            } elseif (preg_match('/^\s*(.+?)\s+<([^<>]+?)>\s+(<[^>]+>|_:[^\s]*|"(\\\\"|[^"])*")(\\^\\^<[^>]+>)?(@[-a-zA-Z0-9]+)?\s*\./', $line, $matches)) {
                 $this->addTriple(
-                    $this->parseNtriplesSubject($matches[1], $lineNum),
-                    $this->unescapeString($matches[2]),
-                    $this->parseNtriplesObject($matches[3], $lineNum)
+                        $this->parseNtriplesSubject($matches[1], $lineNum),
+                        $this->unescapeString($matches[2]),
+                        $this->parseNtriplesObject($matches, $lineNum)
                 );
             } elseif (preg_match('/^\s*$/', $line)) {
                 # Blank line
                 continue;
             } else {
                 throw new Exception(
-                    "Failed to parse statement",
-                    $lineNum
+                        "Failed to parse statement",
+                        $lineNum
                 );
             }
         }
