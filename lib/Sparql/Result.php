@@ -38,7 +38,6 @@ namespace EasyRdf\Sparql;
 use EasyRdf\Exception;
 use EasyRdf\Literal;
 use EasyRdf\Resource;
-use EasyRdf\RdfNamespace;
 
 /**
  * Class for returned for SPARQL SELECT and ASK query responses.
@@ -258,7 +257,7 @@ class Result extends \ArrayIterator
             case 'bnode':
                 return new Resource('_:'.$data['value']);
             case 'uri':
-                return new Resource(RdfNamespace::expand($data['value']));
+                return new Resource($data['value']);
             case 'literal':
             case 'typed-literal':
                 return Literal::create($data);
@@ -277,7 +276,7 @@ class Result extends \ArrayIterator
     protected function parseXml($data)
     {
         $doc = new \DOMDocument();
-        $doc->loadXML($data);
+        $doc->loadXML($data, LIBXML_PARSEHUGE);
 
         # Check for valid root node.
         if ($doc->hasChildNodes() == false or
