@@ -398,7 +398,6 @@ class ResourceTest extends TestCase
         $this->assertSame($this->resource, $homepage->get('^foaf:homepage'));
     }
 
-    /* Undocumented therefore skipped
     public function testGetMultipleProperties()
     {
         $this->setupTestGraph();
@@ -407,9 +406,7 @@ class ResourceTest extends TestCase
             $this->resource->get('rdf:test|rdf:foobar')
         );
     }
-     */
 
-    /* Undocumented therefore skipped
     public function testGetMultipleProperties2()
     {
         $this->setupTestGraph();
@@ -418,7 +415,6 @@ class ResourceTest extends TestCase
             $this->resource->get('rdf:foobar|rdf:test')
         );
     }
-     */
 
     public function testGetNonExistantProperty()
     {
@@ -431,7 +427,7 @@ class ResourceTest extends TestCase
         $this->setupTestGraph();
         $this->setExpectedException(
             'InvalidArgumentException',
-            '$uri should be a string and cannot be null or empty'
+            '$propertyPath should be a string or EasyRdf\Resource and cannot be null'
         );
         $this->resource->get(null);
     }
@@ -441,7 +437,7 @@ class ResourceTest extends TestCase
         $this->setupTestGraph();
         $this->setExpectedException(
             'InvalidArgumentException',
-            '$uri should be a string and cannot be null or empty'
+            '$propertyPath cannot be an empty string'
         );
         $this->resource->get('');
     }
@@ -451,9 +447,9 @@ class ResourceTest extends TestCase
         $this->setupTestGraph();
         $this->setExpectedException(
             'InvalidArgumentException',
-            '$uri should be a string and cannot be null or empty'
+            '$propertyPath should be a string or EasyRdf\Resource and cannot be null'
         );
-        $this->resource->get(array());
+        $this->resource->get($this);
     }
 
     public function testGetLiteral()
@@ -544,7 +540,7 @@ class ResourceTest extends TestCase
         $this->setupTestGraph();
         $this->setExpectedException(
             'InvalidArgumentException',
-            '$uri should be a string and cannot be null or empty'
+            '$propertyPath should be a string or EasyRdf\Resource and cannot be null'
         );
         $this->resource->all(null);
     }
@@ -554,7 +550,7 @@ class ResourceTest extends TestCase
         $this->setupTestGraph();
         $this->setExpectedException(
             'InvalidArgumentException',
-            '$uri should be a string and cannot be null or empty'
+            '$propertyPath cannot be an empty string'
         );
         $this->resource->all('');
     }
@@ -564,7 +560,7 @@ class ResourceTest extends TestCase
         $this->setupTestGraph();
         $this->setExpectedException(
             'InvalidArgumentException',
-            '$uri should be a string and cannot be null or empty'
+            '$propertyPath should be a string or EasyRdf\Resource and cannot be null'
         );
         $this->resource->all(array());
     }
@@ -737,8 +733,13 @@ class ResourceTest extends TestCase
     public function testAddInvalidObject()
     {
         $this->setupTestGraph();
+        if (version_compare(PHP_VERSION, '7.4.x-dev', '>')) {
+            $class = '\Error';
+        } else {
+            $class = '\PHPUnit\Framework\Error\Error';
+        }
         $this->setExpectedException(
-            'PHPUnit_Framework_Error',
+            $class,
             'Object of class EasyRdf\ResourceTest could not be converted to string'
         );
         $this->resource->add('rdf:foo', $this);
@@ -767,7 +768,7 @@ class ResourceTest extends TestCase
         $this->setupTestGraph();
         $this->setExpectedException(
             'InvalidArgumentException',
-            '$uri should be a string and cannot be null or empty'
+            '$property should be a string or EasyRdf\Resource and cannot be null'
         );
         $this->resource->delete(null);
     }
@@ -777,7 +778,7 @@ class ResourceTest extends TestCase
         $this->setupTestGraph();
         $this->setExpectedException(
             'InvalidArgumentException',
-            '$uri should be a string and cannot be null or empty'
+            '$property cannot be an empty string'
         );
         $this->resource->delete('');
     }
@@ -787,7 +788,7 @@ class ResourceTest extends TestCase
         $this->setupTestGraph();
         $this->setExpectedException(
             'InvalidArgumentException',
-            '$uri should be a string and cannot be null or empty'
+            '$property should be a string or EasyRdf\Resource and cannot be null'
         );
         $this->resource->delete(array());
     }

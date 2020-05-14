@@ -132,6 +132,24 @@ class GraphTest extends TestCase
         $this->assertSame(null, $name->getDatatype());
     }
 
+    /**
+     * Tests faulty behavior of issue https://github.com/sweetyrdf/easyrdf/issues/8
+     *
+     * If null is given as $baseUri, the script leads to a dead end and results in a fatal error:
+     *
+     *      Call to a member function setFragment() on null
+     */
+    public function testIssue8ParseRdfa()
+    {
+        $text = 'Invalid case reached: Either parameter $baseUri is empty or XML document does not provide a base URI.'
+            .' See https://github.com/sweetyrdf/easyrdf/issues/8 for more information';
+
+        $this->setExpectedException(Exception::class, $text);
+
+        $graph = new Graph();
+        $graph->parse('data', 'rdfa', null);
+    }
+
     public function testParseDataGuess()
     {
         $graph = new Graph();
@@ -158,6 +176,13 @@ class GraphTest extends TestCase
         $this->assertSame('en', $name->getLang());
         $this->assertSame(null, $name->getDatatype());
     }
+
+	public function testParseLargeFile()
+	{
+		$graph = new Graph();
+		$count = $graph->parseFile(fixturePath('stw.rdf'));
+		$this->assertSame(109340, $count);
+	}
 
     public function testParseFileRelativeUri()
     {
@@ -384,6 +409,16 @@ class GraphTest extends TestCase
         $this->assertStringEquals('http://example.com/', $resource1->getUri());
         $resource2 = $graph->resource('http://example.com/');
         $this->assertTrue($resource1 === $resource2);
+    }
+
+    public function testGetResourcePropertyWithSlash()
+    {
+        $graph = new Graph();
+        $resource1 = $graph->resource('http://example.com/');
+        $resource2 = $graph->resource('bar');
+        $graph->addResource($resource1, 'http://example.org/foo', $resource2);
+        $value = $resource1->get('http://example.org/foo');
+        $this->assertTrue($value === $resource2);
     }
 
     public function testGetResourceDifferentGraph()
@@ -1240,8 +1275,13 @@ class GraphTest extends TestCase
 
     public function testAddInvalidObject()
     {
+        if (version_compare(PHP_VERSION, '7.4.x-dev', '>')) {
+            $class = '\Error';
+        } else {
+            $class = '\PHPUnit\Framework\Error\Error';
+        }
         $this->setExpectedException(
-            'PHPUnit_Framework_Error',
+            $class,
             'Object of class EasyRdf\GraphTest could not be converted to string'
         );
         $this->graph->add($this->uri, 'rdf:foo', $this);
