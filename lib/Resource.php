@@ -66,12 +66,14 @@ class Resource implements \ArrayAccess
         if ($uri instanceof Resource) {
             $graph = $graph ? $graph : $uri->getGraph();
             $uri = $uri->getUri();
+        } elseif (is_object($uri)) {
+            throw new \InvalidArgumentException("\$uri should be a string or EasyRdf\Resource and cannot be null or empty");
         }
 
         $uri = preg_replace('|^<(.*)>$|', '\\1', $uri);
 
         if (!is_string($uri) or $uri == null or $uri == '') {
-            throw new \InvalidArgumentException("\$uri should be a string and cannot be null or empty");
+            throw new \InvalidArgumentException("\$uri should be a string or EasyRdf\Resource and cannot be null or empty");
         }
 
         $this->uri = $uri;
