@@ -865,11 +865,8 @@ class Resource implements \ArrayAccess
             if (in_array($prop, $skipProp) || preg_match($skipRegExp, $prop)) {
                 continue;
             }
-            foreach ($this->allLiterals($prop) as $i) {
-                $res->addLiteral($prop, $i->getValue(), $i->getLang());
-            }
-            foreach ($this->allResources($prop) as $i) {
-                $res->addResource($prop, $i->getUri());
+            foreach ($this->all($prop) as $i) {
+                $res->add($prop, $i);
             }
         }
 
