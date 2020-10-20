@@ -61,7 +61,7 @@ class ParseRssTest extends \EasyRdf\TestCase
             "<p>Description: It's triples all the way down</p>",
             $output
         );
-        $this->assertContains('<li><a href="http://', $output);
+        $this->assertContains('<li><a href="https://', $output);
         $this->assertContains('</a></li>', $output);
     }
 }
