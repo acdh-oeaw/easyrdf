@@ -516,4 +516,21 @@ class LiteralTest extends TestCase
         );
         Literal::deleteDatatypeMapping(array());
     }
+    
+    public function testCreateBDDate()
+    {
+        $literal = Literal::create('123-01-01', null, 'http://www.w3.org/2001/XMLSchema#date');
+        $this->assertClass('EasyRdf\Literal\Date', $literal);
+        $this->assertEquals('123-01-01', (string) $literal);
+
+        $literal = Literal::create('-123-01-01', null, 'http://www.w3.org/2001/XMLSchema#date');
+        $this->assertClass('EasyRdf\Literal', $literal);
+        $this->assertEquals('-123-01-01', $literal->getValue());
+        $this->assertEquals('-123-01-01', (string) $literal);
+        
+        $literal = Literal::create('-12345-01-01', null, 'http://www.w3.org/2001/XMLSchema#date');
+        $this->assertClass('EasyRdf\Literal', $literal);
+        $this->assertEquals('-12345-01-01', $literal->getValue());
+        $this->assertEquals('-12345-01-01', (string) $literal);
+    }
 }

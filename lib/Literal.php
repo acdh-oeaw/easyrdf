@@ -105,7 +105,9 @@ class Literal
         }
 
         // Work out what class to use for this datatype
-        if (isset(self::$datatypeMap[$datatype])) {
+        // do not map dates before Christ as they are cousing a lot of troubles
+        $skipBCDate = ($datatype === 'http://www.w3.org/2001/XMLSchema#date' || $datatype === 'http://www.w3.org/2001/XMLSchema#dateTime') && !is_object($value) && substr($value, 0, 1) === '-';
+        if (isset(self::$datatypeMap[$datatype]) && !$skipBCDate) {
             $class = self::$datatypeMap[$datatype];
         } else {
             $class = 'EasyRdf\Literal';
