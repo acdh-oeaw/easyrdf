@@ -1015,6 +1015,12 @@ class Turtle extends Ntriples
 
         // Unread last character
         $this->unread($c);
+        // Dot is not allowed at the end of the localName
+        $c = substr($localName, -1);
+        if ($c === '.') {
+            $localName = substr($localName, 0, -1);
+            $this->unread($c);
+        }
 
         // Note: namespace has already been resolved
         return array(
@@ -1275,7 +1281,7 @@ class Turtle extends Ntriples
         return
             self::isNameStartChar($c) ||
             $o >= 0x30 && $o <= 0x39 ||     # 0-9
-            $c == '-' ||
+            $c == '-' || $c == '.' ||
             $o == 0x00B7 ||
             $o >= 0x0300 && $o <= 0x036F ||
             $o >= 0x203F && $o <= 0x2040;
