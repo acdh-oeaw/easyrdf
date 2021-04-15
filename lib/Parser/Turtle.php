@@ -1021,7 +1021,7 @@ class Turtle extends Ntriples
             $localName = substr($localName, 0, -1);
             $this->unread($c);
         }
-
+        
         // Note: namespace has already been resolved
         return array(
             'type' => 'uri',
@@ -1079,6 +1079,12 @@ class Turtle extends Ntriples
         }
 
         $this->unread($c);
+        // Dot is not allowed at the end of the name
+        $c = substr($name, -1);
+        if ($c === '.') {
+            $name = substr($name, 0, -1);
+            $this->unread($c);
+        }
 
         return array(
             'type' => 'bnode',
