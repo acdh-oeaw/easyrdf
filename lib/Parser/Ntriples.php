@@ -216,7 +216,7 @@ class Ntriples extends Parser
             if (preg_match('/^\s*#/', $line)) {
                 # Comment
                 continue;
-            } elseif (preg_match('/^\s*(.+?)\s+<([^<>]+?)>\s+(<[^>]+>|_:[^\s]*|"(\\\\"|[^"])*")(\\^\\^<[^>]+>)?(@[-a-zA-Z0-9]+)?\s*\./', $line, $matches)) {
+            } elseif (preg_match('/^\s*(.+?)\s+<([^<>]+?)>\s+(<[^>]+>|_:[^\s]*|"((?>[^"]|\\")*)")(\\^\\^<[^>]+>)?(@[-a-zA-Z0-9]+)?\s*\./', $line, $matches)) {
                 $this->addTriple(
                         $this->parseNtriplesSubject($matches[1], $lineNum),
                         $this->unescapeString($matches[2]),
