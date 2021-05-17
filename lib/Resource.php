@@ -289,7 +289,7 @@ class Resource implements \ArrayAccess
     /** Delete an object property (or optionally just a specific value)
      *
      * @param  string  $property The name of the property (e.g. foaf:name)
-     * @param  object  $value The value to delete (null to delete all values)
+     * @param  mixed  $value The value to delete (null to delete all values)
      *
      * @return integer
      */
@@ -403,7 +403,7 @@ class Resource implements \ArrayAccess
      * @param  string|array $property The name of the property (e.g. foaf:name)
      * @param  string       $lang     The language to filter by (e.g. en)
      *
-     * @return Literal  Literal value associated with the property
+     * @return Literal|null  Literal value associated with the property
      */
     public function getLiteral($property, $lang = null)
     {
@@ -421,7 +421,7 @@ class Resource implements \ArrayAccess
      *
      * @param  string|array $property The name of the property (e.g. foaf:name)
      *
-     * @return self  Resource associated with the property
+     * @return Resource|null  Resource associated with the property
      */
     public function getResource($property)
     {
