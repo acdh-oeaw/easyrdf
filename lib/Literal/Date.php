@@ -96,7 +96,7 @@ class Date extends Literal
      */
     public function getValue()
     {
-        return new \DateTime($this->value);
+        return strval($this->value);
     }
 
     /** Returns date formatted according to given format
