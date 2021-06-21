@@ -894,11 +894,8 @@ class Resource implements \ArrayAccess
             if (!in_array($prop, $preserve)) {
                 $this->delete($prop);
             }
-            foreach ($toMerge->allLiterals($prop) as $i) {
-                $this->addLiteral($prop, $i->getValue(), $i->getLang());
-            }
-            foreach ($toMerge->allResources($prop) as $i) {
-                $this->addResource($prop, $i->getUri());
+            foreach ($toMerge->all($prop) as $i) {
+                $this->add($prop, $i);
             }
         }
         return $this;
