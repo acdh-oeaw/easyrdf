@@ -96,7 +96,7 @@ class Turtle extends Ntriples
             );
         }
 
-        $this->data = preg_split('//u', $data, null, PREG_SPLIT_NO_EMPTY);
+        $this->data = preg_split('//u', $data, -1, PREG_SPLIT_NO_EMPTY);
         $this->index = 0;
         $this->namespaces = array();
         $this->subject = null;
@@ -1223,7 +1223,7 @@ class Turtle extends Ntriples
         $len = mb_strlen($c, "UTF-8");
         $this->column -= $len;
         $this->index -= $len;
-        foreach (preg_split('//u', $c, null, PREG_SPLIT_NO_EMPTY) as $h => $i) {
+        foreach (preg_split('//u', $c, -1, PREG_SPLIT_NO_EMPTY) as $h => $i) {
             $this->data[$this->index + $h] = $i;
         }
     }
