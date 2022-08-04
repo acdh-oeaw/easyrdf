@@ -320,6 +320,7 @@ class Result extends \ArrayIterator
                         if ($node->nodeType != XML_ELEMENT_NODE) {
                             continue;
                         }
+                        /** @var \DOMElement $node */
                         $t->$key = $this->newTerm(
                             array(
                                 'type' => $node->nodeName,

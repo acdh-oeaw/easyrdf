@@ -144,7 +144,7 @@ class Ntriples extends Parser
      * @param array $matches an array providing the RDF triple object value 
      *   in the fourth element, datatype in sixth element and lang tag in 
      *   seventh element
-     * @param type $lineNum 
+     * @param int $lineNum 
      * @return array 
      * @throws Exception
      * @ignore

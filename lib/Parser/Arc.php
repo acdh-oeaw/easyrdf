@@ -1,6 +1,8 @@
 <?php
 namespace EasyRdf\Parser;
 
+use EasyRdf\Graph;
+
 /**
  * EasyRdf
  *

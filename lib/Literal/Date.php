@@ -108,7 +108,7 @@ class Date extends Literal
      */
     public function format($format)
     {
-        return $this->getValue()->format($format);
+        return $this->value->format($format);
     }
 
     /** A full integer representation of the year, 4 digits

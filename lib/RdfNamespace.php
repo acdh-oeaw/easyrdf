@@ -373,6 +373,7 @@ class RdfNamespace
         if ($parts = self::splitUri($uri)) {
             return $parts[0];
         }
+        throw new \RuntimeException("Prefix can not be extracted from $uri");
     }
 
     /**
@@ -394,6 +395,7 @@ class RdfNamespace
         if ($parts = self::splitUri($uri, $createNamespace)) {
             return implode(':', $parts);
         }
+        throw new \RuntimeException("URI $uri can not be shortened");
     }
 
     /**

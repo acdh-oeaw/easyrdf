@@ -169,6 +169,7 @@ class Resource implements \ArrayAccess
         if (preg_match("|([^#:/]+)$|", $this->uri, $matches)) {
             return $matches[1];
         }
+        throw new \RuntimeException('Local name can not be extracted from ' . $this->uri);
     }
 
     /** Parse the URI of the resource and return as a ParsedUri object
@@ -814,7 +815,7 @@ class Resource implements \ArrayAccess
      *
      * @link http://php.net/manual/en/arrayaccess.offsetset.php
      *
-     * @param mixed The offset to assign the value to.
+     * @param mixed $offset The offset to assign the value to.
      * @param mixed $value The value to set.
      *
      * @return void
