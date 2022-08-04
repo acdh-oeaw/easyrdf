@@ -366,14 +366,14 @@ class RdfNamespace
       *
       * @param string $uri A full URI (eg 'http://xmlns.com/foaf/0.1/name')
      *
-      * @return string The prefix namespace that it is a part of(eg 'foaf')
+      * @return string|null The prefix namespace that it is a part of(eg 'foaf')
       */
     public static function prefixOfUri($uri)
     {
         if ($parts = self::splitUri($uri)) {
             return $parts[0];
         }
-        throw new \RuntimeException("Prefix can not be extracted from $uri");
+        return null;
     }
 
     /**
@@ -388,14 +388,14 @@ class RdfNamespace
       * @param string  $uri The full URI (eg 'http://xmlns.com/foaf/0.1/name')
       * @param bool    $createNamespace If true, a new namespace will be created
       *
-      * @return string The shortened URI (eg 'foaf:name') or null
+      * @return string|null The shortened URI (eg 'foaf:name') or null
       */
     public static function shorten($uri, $createNamespace = false)
     {
         if ($parts = self::splitUri($uri, $createNamespace)) {
             return implode(':', $parts);
         }
-        throw new \RuntimeException("URI $uri can not be shortened");
+        return null;
     }
 
     /**

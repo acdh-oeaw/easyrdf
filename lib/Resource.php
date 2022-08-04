@@ -162,14 +162,14 @@ class Resource implements \ArrayAccess
      * The local name is defined as the part of the URI string
      * after the last occurrence of the '#', ':' or '/' character.
      *
-     * @return string The local name
+     * @return string|null The local name
      */
     public function localName()
     {
         if (preg_match("|([^#:/]+)$|", $this->uri, $matches)) {
             return $matches[1];
         }
-        throw new \RuntimeException('Local name can not be extracted from ' . $this->uri);
+        return null;
     }
 
     /** Parse the URI of the resource and return as a ParsedUri object
