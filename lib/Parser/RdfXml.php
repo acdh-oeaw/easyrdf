@@ -6,7 +6,7 @@ namespace EasyRdf\Parser;
  *
  * LICENSE
  *
- * Copyright (c) 2010-2013 Nicholas J Humfrey
+ * Copyright (c) Nicholas J Humfrey
  * Copyright (c) 2004-2010 Benjamin Nowack (based on ARC2_RDFXMLParser.php)
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,8 +33,8 @@ namespace EasyRdf\Parser;
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @package    EasyRdf
- * @copyright  Copyright (c) 2010-2013 Nicholas J Humfrey
- * @license    http://www.opensource.org/licenses/bsd-license.php
+ * @copyright  Copyright (c) Nicholas J Humfrey
+ * @license    https://www.opensource.org/licenses/bsd-license.php
  */
 use EasyRdf\Graph;
 use EasyRdf\ParsedUri;
@@ -44,9 +44,9 @@ use EasyRdf\Parser;
  * A pure-php class to parse RDF/XML.
  *
  * @package    EasyRdf
- * @copyright  Copyright (c) 2009-2013 Nicholas J Humfrey
+ * @copyright  Copyright (c) Nicholas J Humfrey
  *             Copyright (c) 2004-2010 Benjamin Nowack (based on ARC2_RDFXMLParser.php)
- * @license    http://www.opensource.org/licenses/bsd-license.php
+ * @license    https://www.opensource.org/licenses/bsd-license.php
  */
 class RdfXml extends Parser
 {
@@ -203,7 +203,7 @@ class RdfXml extends Parser
     /** @ignore */
     protected function startElementHandler($p, $t, $a)
     {
-        switch($this->state) {
+        switch ($this->state) {
             case 0:
                 return $this->startState0($t, $a);
             case 1:
@@ -226,7 +226,7 @@ class RdfXml extends Parser
     /** @ignore */
     protected function endElementHandler($p, $t)
     {
-        switch($this->state){
+        switch ($this->state) {
             case 1:
                 return $this->endState1($t);
             case 2:
@@ -249,7 +249,7 @@ class RdfXml extends Parser
     /** @ignore */
     protected function cdataHandler($p, $d)
     {
-        switch($this->state){
+        switch ($this->state) {
             case 4:
                 return $this->cdataState4($d);
             case 6:
@@ -328,7 +328,6 @@ class RdfXml extends Parser
                 $this->add($supS['value'], $supS['p'], $coll['value'], $supS['type'], $coll['type']);
                 $this->add($coll['value'], $this->rdf.'first', $s['value'], $coll['type'], $s['type']);
                 $this->pushS($coll);
-
             } elseif (isset($supS['is_coll']) && $supS['is_coll']) {
                 /* new entry in existing coll */
                 $coll = array(
@@ -799,16 +798,18 @@ class RdfXml extends Parser
         /* xml parser */
         $this->initXMLParser();
 
-        /* parse */
+        /* split into 1MB chunks, so XML parser can cope */
+        $chunkSize = 1000000;
+        $length = strlen($data);
+        for ($pos=0; $pos < $length; $pos += $chunkSize) {
+            $chunk = substr($data, $pos, $chunkSize);
+            $isLast = ($pos + $chunkSize > $length);
 
-        $resource = fopen('data://text/plain,' . urlencode($data), 'r');
-
-        while ($data = fread($resource, 1024 * 1024)) {
-            if (!xml_parse($this->xmlParser, $data, feof($resource))) {
+            /* Parse the chunk */
+            if (!xml_parse($this->xmlParser, $chunk, $isLast)) {
                 $message = xml_error_string(xml_get_error_code($this->xmlParser));
-                
                 throw new Exception(
-                    sprintf('XML error: "%s"', $message),
+                    'XML error: "' . $message . '"',
                     xml_get_current_line_number($this->xmlParser),
                     xml_get_current_column_number($this->xmlParser)
                 );
